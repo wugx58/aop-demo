@@ -1,11 +1,10 @@
-package com.aop.demo;
+package com.aop.demo.myaop;
 
-
-import com.aop.demo.interceptor.AfterInterceptor;
-import com.aop.demo.interceptor.BeforeInterceptor;
-import com.aop.demo.interceptor.ExceptionInterceptor;
-import com.aop.demo.service.GreetingService;
-import com.aop.demo.service.HelloService;
+import com.aop.demo.myaop.interceptor.AfterInterceptor;
+import com.aop.demo.myaop.interceptor.BeforeInterceptor;
+import com.aop.demo.myaop.interceptor.ExceptionInterceptor;
+import com.aop.demo.myaop.service.GreetingService;
+import com.aop.demo.myaop.service.HelloService;
 
 import java.lang.reflect.Proxy;
 
