@@ -26,26 +26,29 @@ public class ProxyCreationDemo {
         applicationContext.register(ProxyCreationDemo.class);
         applicationContext.refresh();
 
-        applicationContext.register(ActionService.class);
+//        applicationContext.register(ActionService.class);
         // 需要设置下autoProxyCreator
         setAutoProxyCreator(applicationContext);
         applicationContext.register(TargetSourceActionService.class);
 
         // 这样处理会通过AbstractAutoProxyCreator#postProcessAfterInitialization()方法来对原有类进行替换
-        ActionService service = applicationContext.getBean(ActionService.class);
-        service.action();
+//        ActionService service = applicationContext.getBean(ActionService.class);
+//        service.action();
 
-        // 这个targetSource的对象，用类型来获取会获取不到
+        // 这个targetSource的对象，用类型依赖查找会获取不到
         TargetSource targetSource = (TargetSource) applicationContext.getBean("proxyCreationDemo.TargetSourceActionService");
         ActionService targetSourceActionService = null;
-        try {
-            // 这个会通过AbstractAutoProxyCreator#postProcessBeforeInstantiation
-            targetSourceActionService = (ActionService) targetSource.getTarget();
-        } catch (Exception e) {
-            e.printStackTrace();
-            return;
+        for(int i = 0;  i < 10; i++){
+            try {
+                // 这个会通过AbstractAutoProxyCreator#postProcessBeforeInstantiation
+                targetSourceActionService = (ActionService) targetSource.getTarget();
+            } catch (Exception e) {
+                e.printStackTrace();
+                return;
+            }
+            targetSourceActionService.action();
         }
-        targetSourceActionService.action();
+
     }
 
     private static void setAutoProxyCreator(ConfigurableApplicationContext applicationContext){
@@ -76,9 +79,19 @@ public class ProxyCreationDemo {
         System.out.println("before");
     }
 
-    class ActionService{
+    interface ActionService{
+        void action();
+    }
+
+    class ActionService1 implements ActionService{
         public void action(){
-            System.out.println("action");
+            System.out.println("ActionService1 : action");
+        }
+    }
+
+    class ActionService2 implements ActionService{
+        public void action(){
+            System.out.println("ActionService2 : action");
         }
     }
 
@@ -96,7 +109,11 @@ public class ProxyCreationDemo {
 
         @Override
         public Object getTarget() throws Exception {
-            return new ActionService();
+            double num = Math.random();
+            if(num > 0.5){
+                return new ActionService1();
+            }
+            return  new ActionService2();
         }
 
         @Override
